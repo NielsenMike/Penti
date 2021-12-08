@@ -24,12 +24,10 @@ def index():
 def check_answer():
     if request.method == 'POST':
         data = request.form.to_dict()
-        result = query_db("select id from catalog where id = ? AND answer like ?",
-                          (data['question_id'], data['answer']), one=True)
-        code = 404
-        if result:
-            code = 200
-        return json.dumps({'correct': True}), code, {'ContentType': 'application/json'}
+        result = query_db("select answer from catalog where id = ?",
+                          (data['question_id'],), one=True)
+        correct = (data['answer'] == result['answer'])
+        return json.dumps({'correct': correct}), 200, {'ContentType': 'application/json'}
 
 def query_db(query, args=(), one=False):
     con = get_db()

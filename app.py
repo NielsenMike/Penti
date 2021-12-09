@@ -10,11 +10,14 @@ DATABASE = 'database_secproj.db'
 
 @app.route('/')
 def index():
-    results = query_db("select id, question, answer from catalog ORDER BY RANDOM() LIMIT 4")
-    question = results[0]['question']
-    db_id = results[0]['id']
+    main_result = query_db("select id, question, category, answer from catalog ORDER BY RANDOM() LIMIT 1", one=True)
+    sub_result = query_db("select answer from catalog WHERE category like (?) ORDER BY RANDOM() LIMIT 3",
+                          (main_result['category'],))
+    question = main_result['question']
+    db_id = main_result['id']
     answers = list()
-    for entry in results:
+    answers.append(main_result['answer'])
+    for entry in sub_result:
         answers.append(entry['answer'])
     random.shuffle(answers)
     return render_template("index.html", id=db_id, question=question, answers=answers)

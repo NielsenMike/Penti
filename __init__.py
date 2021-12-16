@@ -5,7 +5,7 @@ import random
 from flask import g, render_template, Flask, request
 
 app = Flask(__name__)
-DATABASE = 'database_secproj.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = "database_secproj.db"
 
 
 @app.route('/')
@@ -32,6 +32,7 @@ def check_answer():
         correct = (data['answer'] == result['answer'])
         return json.dumps({'correct': correct}), 200, {'ContentType': 'application/json'}
 
+
 def query_db(query, args=(), one=False):
     con = get_db()
     con.row_factory = dict_factory
@@ -40,11 +41,13 @@ def query_db(query, args=(), one=False):
     cur.close()
     return (rv[0] if rv else None) if one else rv
 
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
+
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -56,7 +59,7 @@ def close_connection(exception):
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
+        db = sqlite3.connect(app.config['SQLALCHEMY_DATABASE_URI'])
     return db
 
 

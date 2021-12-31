@@ -11,8 +11,8 @@ DATABASE = 'database_secproj.db'
 @app.route('/')
 def index():
     main_result = query_db("select id, question, category, answer from catalog ORDER BY RANDOM() LIMIT 1", one=True)
-    sub_result = query_db("select answer from catalog WHERE category like (?) ORDER BY RANDOM() LIMIT 3",
-                          (main_result['category'],))
+    sub_result = query_db("select answer from catalog WHERE category like (?)  and NOT id = (?) ORDER BY RANDOM() LIMIT 3",
+                          (main_result['category'], main_result['id'],))
     question = main_result['question']
     db_id = main_result['id']
     answers = list()
